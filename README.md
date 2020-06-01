@@ -2,7 +2,7 @@
 这是一个让元素实现贝塞尔曲线轨迹运动的JS插件
 
 # Example
-<iframe src="./example/index.html"></iframe>
+https://maoyonglong.github.io/bezier_movement
 
 # Usage
 ```js

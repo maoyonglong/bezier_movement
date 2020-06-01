@@ -1,5 +1,5 @@
 import babel from 'rollup-plugin-babel'
-import uglify from 'rollup-plugin-uglify'
+import {uglify} from 'rollup-plugin-uglify'
 
 const isProd = process.env.NODE_ENV.trim() === 'production'
 const name = 'BezierMovement'

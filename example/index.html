@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BezierMovement</title>
+    <style>
+      .track-point {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: yellow;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #eee;
+      }
+      .box {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border: 1px solid black;
+        color: white;
+        background-color: aqua;
+      }
+      .ball {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background-color: bisque;
+        border-radius: 50%;
+      }
+      .fixed-point {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: blue;
+        color: #fff;
+        text-align: center;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      aside {
+        position: absolute;
+        right: 10px;
+      }
+      .point-input {
+        width: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <select id="type" value="cubic">
+        <option value="cubic">cubic</option>
+        <option value="linear">linear</option>
+        <option value="quadratic">quadratic</option>
+      </select>
+      <div class="fixpoints">
+        <div>
+          fixPoint1: x: <input class="point-input" id="cx1" value="0" /> y:
+          <input class="point-input" id="cy1" value="0" />
+        </div>
+        <div>
+          fixPoint2: x: <input class="point-input" id="cx2" value="100" /> y:
+          <input class="point-input" id="cy2" value="100" />
+        </div>
+      </div>
+      <div>
+        box: x: <input class="point-input" id="x1" value="20" /> y:
+        <input class="point-input" id="y1" value="200" />
+      </div>
+      <div>
+        ball: x: <input class="point-input" id="x2" value="400" /> y:
+        <input class="point-input" id="y2" value="20" />
+      </div>
+      <button onclick="toggleTrack()">toggle curve</button>
+      <button onclick="play()">play</button>
+      <button onclick="reset()">reset</button>
+    </aside>
+    <div class="fixed-point" style="background-color: red">1</div>
+    <div class="fixed-point">2</div>
+    <div class="box"></div>
+    <div class="ball"></div>
+    <script src="../dist/bezier-movement.js"></script>
+    <script>
+      const boxDom = document.querySelector(".box")
+      const ballDom = document.querySelector(".ball")
+      const containerDom = document.body
+      const x1Dom = document.querySelector("#x1")
+      const y1Dom = document.querySelector("#y1")
+      const x2Dom = document.querySelector("#x2")
+      const y2Dom = document.querySelector("#y2")
+      const cx1Dom = document.querySelector("#cx1")
+      const cy1Dom = document.querySelector("#cy1")
+      const cx2Dom = document.querySelector("#cx2")
+      const cy2Dom = document.querySelector("#cy2")
+      const typeDom = document.querySelector("#type")
+      const fixedPointsDoms = document.querySelectorAll(".fixed-point")
+      let isShowTrack = false
+      let movement, trackMovement
+
+      function makeMovable(dom, xDom, yDom, container) {
+        dom.onmousedown = function (evt) {
+          var oEvent = evt || event
+
+          document.onmousemove = function (evt) {
+            var oEvent = evt || event
+            var left = oEvent.clientX
+            var top = oEvent.clientY
+            console.log(container.offsetLeft + container.offsetWidth)
+            if (left <= container.offsetLeft) {
+              left = container.offsetLeft
+            }
+            else if (
+              left >= container.offsetLeft + container.offsetWidth
+            ) {
+              left = container.offsetLeft + container.offsetWidth
+            }
+            if (top <= container.offsetTop) {
+              top = container.offsetTop
+            } else if (
+              top >= container.offsetTop + container.offsetWidth
+            ) {
+              top = container.offsetTop + container.offsetWidth
+            }
+            console.log(left)
+            xDom.value = left
+            yDom.value = top
+            dom.style.top = top + "px"
+            dom.style.left = left + "px"
+            reset()
+          }
+          document.onmouseup = function () {
+            document.onmousemove = null
+            dom.onmouseup = null
+          }
+        }
+      }
+
+      makeMovable(fixedPointsDoms[0], cx1Dom, cy1Dom, containerDom)
+      makeMovable(fixedPointsDoms[1], cx2Dom, cy2Dom, containerDom)
+      makeMovable(boxDom, x1Dom, y1Dom, containerDom)
+      makeMovable(ballDom, x2Dom, y2Dom, containerDom)
+
+      typeDom.onchange = function () {
+        reset()
+      }
+
+      cx1Dom.oninput = function () {
+        fixedPointsDoms[0].style.left = cx1Dom.value + "px"
+        reset()
+      }
+
+      cy1Dom.oninput = function () {
+        fixedPointsDoms[0].style.top = cy1Dom.value + "px"
+        reset()
+      }
+
+      cx2Dom.oninput = function () {
+        fixedPointsDoms[1].style.left = cx2Dom.value + "px"
+        reset()
+      }
+
+      cy2Dom.oninput = function () {
+        fixedPointsDoms[1].style.top = cy2Dom.value + "px"
+        reset()
+      }
+
+      function setPosition(target, point) {
+        target.style.left = point.x + "px"
+        target.style.top = point.y + "px"
+      }
+
+      function setBoxBallPosition() {
+        const x1 = x1Dom.value
+        const y1 = y1Dom.value
+        const x2 = x2Dom.value
+        const y2 = y2Dom.value
+        const cx1 = cx1Dom.value
+        const cy1 = cy1Dom.value
+        const cx2 = cx2Dom.value
+        const cy2 = cy2Dom.value
+        boxDom.style.left = x1 + "px"
+        boxDom.style.top = y1 + "px"
+        ballDom.style.left = x2 + "px"
+        ballDom.style.top = y2 + "px"
+        fixedPointsDoms[0].style.left = cx1 + "px"
+        fixedPointsDoms[0].style.top = cy1 + "px"
+        fixedPointsDoms[1].style.left = cx2 + "px"
+        fixedPointsDoms[1].style.top = cy2 + "px"
+      }
+
+      function getPosition(target) {
+        return [target.offsetLeft, target.offsetTop]
+      }
+
+      function newMovement() {
+        const type = typeDom.value
+        let fixedPoints = undefined
+        if (type === "linear") {
+          fixedPoints = []
+        } else if (type === "quadratic") {
+          fixedPoints = [[cx1Dom.value, cy1Dom.value]]
+        } else if (type === "cubic") {
+          fixedPoints = [
+            [cx1Dom.value, cy1Dom.value],
+            [cx2Dom.value, cy2Dom.value],
+          ]
+        }
+        return new BezierMovement({
+          type: typeDom.value,
+          container: containerDom,
+          target: ballDom,
+          fixedPoints,
+          start: getPosition(ballDom),
+          end: getPosition(boxDom),
+        })
+      }
+
+      function play() {
+        setBoxBallPosition()
+        movement = newMovement()
+        movement.play()
+      }
+
+      function toggleTrack() {
+        isShowTrack = !isShowTrack
+        if (trackMovement) {
+          trackMovement.removeTrack().genTrack().toggleTrack(isShowTrack)
+        }
+      }
+
+      function reset() {
+        setBoxBallPosition()
+        trackMovement.removeTrack()
+        trackMovement = newMovement().genTrack().toggleTrack(isShowTrack)
+      }
+
+      setBoxBallPosition()
+      movement = newMovement()
+      trackMovement = newMovement()
+      toggleTrack()
+    </script>
+  </body>
+</html>

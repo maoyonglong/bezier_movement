@@ -1,0 +1,32 @@
+{
+  "name": "bezier_movement",
+  "version": "1.0.0",
+  "description": "This is a JS plugin for dom to realize Bezier curve trace motion",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run dev",
+    "build": "set NODE_ENV=production && rollup --config rollup.config.js",
+    "dev": "set NODE_ENV=development && rollup --config rollup.config.js --watch",
+    "publish": "npm publish --registry http://registry.npmjs.org"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maoyonglong/bezier_movement.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maoyonglong/bezier_movement/issues"
+  },
+  "homepage": "https://github.com/maoyonglong/bezier_movement#readme",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-transform-runtime": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/runtime": "^7.10.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "rollup": "^2.12.0",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-uglify": "^6.0.4"
+  }
+}

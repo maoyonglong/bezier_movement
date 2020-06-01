@@ -1,0 +1,45 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "chrome": "58",
+          "ie": "8"
+        },
+        "modules": false
+      }
+    ]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    },
+    "dev": {
+      "plugins": [
+        [
+          "@babel/transform-runtime",
+          {
+            "helpers": true,
+            "useESModules": true,
+            "absoluteRuntime": true
+          }
+        ]
+      ]
+    },
+    "build": {
+      "plugins": [
+        [
+          "@babel/transform-runtime",
+          {
+            "helpers": true,
+            "useESModules": true,
+            "absoluteRuntime": true
+          }
+        ]
+      ]
+    }
+  }
+}
